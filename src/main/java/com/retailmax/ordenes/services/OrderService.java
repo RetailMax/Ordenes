@@ -1,9 +1,11 @@
 package com.retailmax.ordenes.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
+import com.retailmax.ordenes.model.Order;
 import com.retailmax.ordenes.repository.OrderRepository;
 
 import jakarta.transaction.Transactional;
@@ -15,12 +17,24 @@ public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
 
-    
-    public void getOrders(){}
-    public void addOrder(){}
-    public void getOrderById(String id){}
-    public void updateOrder(String id){}
-    public void deleteOrder(String id){}
+    public List<Order> getOrders() {
+        return orderRepository.findAll();
+    }
 
+    public Boolean addOrder(Order order) {
+        return orderRepository.addNewOrder(order);
+    }
+
+    public Order getOrderById(String id) {
+        return orderRepository.findById(id);
+    }
+
+    public Boolean updateOrder(Order order) {
+        return orderRepository.updateOrder(order);
+    }
+
+    public Boolean deleteOrder(String id) {
+        return orderRepository.deleteOrderById(id);
+    }
 
 }
