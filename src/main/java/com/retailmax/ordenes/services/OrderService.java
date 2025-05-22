@@ -21,20 +21,20 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
-    public Boolean addOrder(Order order) {
-        return orderRepository.addNewOrder(order);
+    public Order addOrder(Order order) {
+        return orderRepository.save(order);
     }
 
-    public Order getOrderById(String id) {
-        return orderRepository.findById(id);
+    public Order getOrderById(Long id) {
+        return orderRepository.findById(id).get();
     }
 
-    public Boolean updateOrder(Order order) {
-        return orderRepository.updateOrder(order);
-    }
+    //public Boolean updateOrder(Order order) {
+      //  return orderRepository.updateOrder(order);
+    //}
 
-    public Boolean deleteOrder(String id) {
-        return orderRepository.deleteOrderById(id);
+    public void delete(Long id){
+        orderRepository.deleteById(id);
     }
 
 }
