@@ -19,57 +19,64 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
+
+
+
 @RestController
 @RequestMapping("/api/v1/orders")
 public class OrderController {
 
-  @Autowired
-  private OrderService OrderService;
+    @Autowired
+    private OrderService OrderService;
 
   @GetMapping()
   public ResponseEntity<List<Order>> listOrders() {
     List<Order> oredenes = OrderService.getOrders();
-    if (oredenes.isEmpty()) {
-      return ResponseEntity.noContent().build();
+    if(oredenes.isEmpty()){
+        return ResponseEntity.noContent().build();
     }
     return ResponseEntity.ok(oredenes);
   }
 
   @PostMapping()
-  public ResponseEntity<Order> addOrder(@RequestBody Order order) {
-    Order result = OrderService.addOrder(order);
+  public ResponseEntity<Boolean> addOrder(@RequestBody Order order) {
+      boolean result = OrderService.addOrder(order);
 
-    if (result != null) {
-      return ResponseEntity.ok(result);
-    } else {
-      return ResponseEntity.noContent().build();
-    }
+      if(result){
+        return ResponseEntity.ok(true);
+      } else{
+        return ResponseEntity.badRequest().body(false);
+      }
   }
 
   @GetMapping("{id}")
-  public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
+  public ResponseEntity<Order> getOrderById(@PathVariable String id) {
     Order order = OrderService.getOrderById(id);
-    if (order.equals(null)) {
-      return ResponseEntity.noContent().build();
+    if (order.equals(null)){
+        return ResponseEntity.noContent().build();
 
     }
-    return ResponseEntity.ok(order);
+    return ResponseEntity.ok(order);  
   }
-
-  /*
-   * @PutMapping()
-   * public ResponseEntity<Boolean> updateOrder(@RequestBody Order order) {
-   * boolean result = OrderService.updateOrder(order);
-   * if(result){
-   * return ResponseEntity.ok(true);
-   * }else{
-   * return ResponseEntity.badRequest().body(false);
-   * }
-   * }
-   */
-
+  
+  @PutMapping()
+  public ResponseEntity<Boolean> updateOrder(@RequestBody Order order) { 
+        boolean result = OrderService.updateOrder(order);     
+        if(result){
+            return ResponseEntity.ok(true);
+        }else{
+            return ResponseEntity.badRequest().body(false);
+        }
+  }
+  
   @DeleteMapping("{id}")
-  public void deleteOrderById(@PathVariable Long id) {
-    OrderService.delete(id);
-  }
+  public  ResponseEntity<Boolean> deleteOrderById(@PathVariable String id) {
+    Boolean order = OrderService.deleteOrder(id);
+    if(order){
+        return ResponseEntity.ok(true);
+    }else{
+        return ResponseEntity.badRequest().body(false);
+    }
 }
+}  
+
