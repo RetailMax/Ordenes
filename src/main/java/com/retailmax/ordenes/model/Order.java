@@ -52,9 +52,9 @@ public class Order {
     @Column(name = "shipping_postal_code")
     private String shippingPostalCode;
 
-    @Column(name = "create_at", nullable = false)
+    @Column(name = "created_at", nullable = false)
     private Date createdAt;
-    @Column(name = "update_at")
+    @Column(name = "updated_at")
     private Date updatedAt;
 
 
