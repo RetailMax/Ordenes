@@ -1,14 +1,19 @@
-package com.retailmax.ordenes.model;
+package com.retailmax.ordenes.model.status;
 
-import java.sql.Date;
+
+
+import java.util.Date;
 
 import org.hibernate.annotations.ManyToAny;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.retailmax.ordenes.model.order.Order;
 
 import jakarta.annotation.Generated;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,21 +34,21 @@ public class OrderStatusHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @JsonBackReference
+    
+    @JsonBackReference("order-status-history")
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @ManyToOne
-    @JoinColumn(name = "status_id", nullable = false)
-    private OrderStatus status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "previous_status")
+    private OrderStatus previousStatus;
 
-    @Column(name = "changed_at", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "new_status", nullable = false)
+    private OrderStatus newStatus;
+
     private Date changedAt;
-    @Column(name = "change_by", nullable = false)
-    private String changeBy;
+    private String changedBy;
 
-
-   
 }

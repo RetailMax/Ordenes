@@ -1,6 +1,4 @@
-package com.retailmax.ordenes.model;
-
-import java.sql.Date;
+package com.retailmax.ordenes.model.order;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -17,26 +15,36 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "payment_events")
+@Table(name = "order_items")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentEvent {
+public class OrderItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@Column(name = "item_id")
     private Long id;
 
-    @JsonBackReference
+    @JsonBackReference("order-items")
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @Column(name = "event_type", nullable = false)
-    private String eventType;
-    @Column(name = "details")
-    private String details;
-    @Column(name = "time_stamp", nullable = false)
-    private Date timestamp;
+    @Column(name= "product_id", nullable = false) 
+    private String productId;
 
+    @Column(name = "product_name")
+    private String productName;
+
+    @Column(name = "sku")
+    private String sku;
+
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
+    
+    @Column(name = "unit_price", nullable = false)
+    private Double unitPrice;
+
+    
 }

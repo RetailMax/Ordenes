@@ -1,6 +1,9 @@
-package com.retailmax.ordenes.model;
+package com.retailmax.ordenes.model.payment;
+
+import java.sql.Date;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.retailmax.ordenes.model.order.Order;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,28 +18,26 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "order_items")
+@Table(name = "payment_events")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderItem {
+public class PaymentEvent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    //@Column(name = "item_id")
     private Long id;
 
-    @JsonBackReference
+    @JsonBackReference("order-payment-events")
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @Column(name= "product_id", nullable = false) 
-    private String productId;
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
-    @Column(name = "unit_price", nullable = false)
-    private Double unitPrice;
+    @Column(name = "event_type", nullable = false)
+    private String eventType;
+    @Column(name = "details")
+    private String details;
+    @Column(name = "time_stamp", nullable = false)
+    private Date timestamp;
 
-    
 }
