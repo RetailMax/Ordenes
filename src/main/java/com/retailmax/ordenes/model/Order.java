@@ -25,23 +25,36 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_id")
+    //@Column(name = "order_id")
     private Long id;
-    @Column(name = "user_id")
+
+    @Column(name = "user_id", nullable = false)
     private String userId;
+    @Column(name = "order_date", nullable = false)
     private Date orderDate;
+    @Column(name = "total_amount", nullable = false)
     private Double totalAmount;
+    @Column(name = "shipping_fee")
     private Double shippingFee;
+    @Column(name = "status_id", nullable = false)
     private Integer statusId;
+    @Column(name = "payment_id")
     private String paymentId;
+    @Column(name = "payment_status")
     private String paymentStatus;
 
+    @Column(name = "shipping_street")
     private String shippingStreet;
+    @Column(name = "shipping_city")
     private String shippingCity;
+    @Column(name = "shipping_region")
     private String shippingRegion;
+    @Column(name = "shipping_postal_code")
     private String shippingPostalCode;
 
+    @Column(name = "create_at", nullable = false)
     private Date createdAt;
+    @Column(name = "update_at")
     private Date updatedAt;
 
 
