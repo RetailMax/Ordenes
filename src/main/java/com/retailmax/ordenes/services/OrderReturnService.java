@@ -3,8 +3,8 @@ package com.retailmax.ordenes.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.retailmax.ordenes.model.Order;
-import com.retailmax.ordenes.model.OrderReturn;
+import com.retailmax.ordenes.model.order.Order;
+import com.retailmax.ordenes.model.returns.OrderReturn;
 import com.retailmax.ordenes.repository.OrderRepository;
 import com.retailmax.ordenes.repository.OrderReturnRepository;
 
