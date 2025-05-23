@@ -56,6 +56,7 @@ public class OrderController {
     return ResponseEntity.ok(order);
   }
 
+  
   /*
    * @PutMapping()
    * public ResponseEntity<Boolean> updateOrder(@RequestBody Order order) {
@@ -71,5 +72,14 @@ public class OrderController {
   @DeleteMapping("{id}")
   public void deleteOrderById(@PathVariable Long id) {
     OrderService.delete(id);
+  }
+
+    @GetMapping("/cliente/{userId}")
+  public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable String userId) {
+    List<Order> orders = OrderService.getOrdersByUserId(userId);
+    if (orders.isEmpty()) {
+      return ResponseEntity.noContent().build();
+    }
+    return ResponseEntity.ok(orders);
   }
 }

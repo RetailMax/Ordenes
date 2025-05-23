@@ -29,12 +29,15 @@ public class OrderService {
         return orderRepository.findById(id).get();
     }
 
-    //public Boolean updateOrder(Order order) {
-      //  return orderRepository.updateOrder(order);
-    //}
+    // public Boolean updateOrder(Order order) {
+    // return orderRepository.updateOrder(order);
+    // }
 
-    public void delete(Long id){
+    public void delete(Long id) {
         orderRepository.deleteById(id);
     }
 
+    public List<Order> getOrdersByUserId(String id) {
+        return orderRepository.findByUserId(id);
+    }
 }
