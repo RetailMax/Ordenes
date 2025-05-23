@@ -4,11 +4,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.retailmax.ordenes.model.Order;
+import com.retailmax.ordenes.model.OrderReturn;
+import com.retailmax.ordenes.services.OrderReturnService;
 import com.retailmax.ordenes.services.OrderService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +28,11 @@ public class OrderController {
 
   @Autowired
   private OrderService OrderService;
+
+  @Autowired
+  private OrderReturnService orderReturnService;
+
+
 
   @GetMapping()
   public ResponseEntity<List<Order>> listOrders() {
@@ -82,4 +90,13 @@ public class OrderController {
     }
     return ResponseEntity.ok(orders);
   }
+
+  @PostMapping("/{orderId}/return")
+  public  ResponseEntity<OrderReturn> addReturn(@PathVariable Long orderId,@RequestBody OrderReturn orderReturn) {
+      OrderReturn createdReturn = orderReturnService.addReturn(orderId, orderReturn);
+      return ResponseEntity.status(HttpStatus.CREATED).body(createdReturn);
+      
+  }
+  
+
 }
