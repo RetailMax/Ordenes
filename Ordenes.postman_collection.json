@@ -129,11 +129,11 @@
           "raw": "{\n  \"returnType\": \"FULL_REFUND\",\n  \"reason\": \"Producto defectuoso\",\n  \"requestedAt\": \"2024-03-19\",\n  \"refundAmount\": 999.99\n}"
         },
         "url": {
-          "raw": "http://localhost:8080/api/v1/orders/1/return",
+          "raw": "http://localhost:8080/api/v1/orders/1/returns",
           "protocol": "http",
           "host": ["localhost"],
           "port": "8080",
-          "path": ["api", "v1", "orders", "1", "return"]
+          "path": ["api", "v1", "orders", "1", "returns"]
         },
         "description": "Crea una solicitud de devolución para una orden"
       }
@@ -144,11 +144,11 @@
         "method": "PUT",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/v1/orders/1/cancelar",
+          "raw": "http://localhost:8080/api/v1/orders/1/cancellation",
           "protocol": "http",
           "host": ["localhost"],
           "port": "8080",
-          "path": ["api", "v1", "orders", "1", "cancelar"]
+          "path": ["api", "v1", "orders", "1", "cancellation"]
         },
         "description": "Cancela una orden existente"
       }
