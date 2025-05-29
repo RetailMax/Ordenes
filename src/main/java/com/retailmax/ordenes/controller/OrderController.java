@@ -105,7 +105,7 @@ public class OrderController {
     return ResponseEntity.ok(orders);
   }
 
-  @PostMapping("/{orderId}/return")
+  @PostMapping("/{orderId}/returns")
   public ResponseEntity<OrderReturn> addReturn(@PathVariable Long orderId, @RequestBody OrderReturn orderReturn) {
     orderReturn.setStatus(ReturnStatus.REQUESTED);
     OrderReturn createdReturn = orderReturnService.addReturn(orderId, orderReturn);
@@ -115,7 +115,7 @@ public class OrderController {
     return ResponseEntity.status(HttpStatus.CREATED).body(createdReturn);
   }
 
-  @PutMapping("/{id}/cancelar")
+  @PutMapping("/{id}/cancellation")
   public ResponseEntity<Order> cancelOrder(@PathVariable Long id) {
     Order canceledOrder = orderService.cancelOrder(id);
     if (canceledOrder != null) {
