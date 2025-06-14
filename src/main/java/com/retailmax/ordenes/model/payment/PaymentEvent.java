@@ -1,7 +1,6 @@
 package com.retailmax.ordenes.model.payment;
 
-import java.sql.Date;
-
+import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.retailmax.ordenes.model.order.Order;
 
