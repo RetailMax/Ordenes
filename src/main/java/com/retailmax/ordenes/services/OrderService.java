@@ -97,7 +97,7 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    private void calculateTotal(Order order) {
+    public void calculateTotal(Order order) {
         double total = 0;
         for (OrderItem item : order.getItems()) {
             total += item.getQuantity() * item.getUnitPrice();
