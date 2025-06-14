@@ -2,7 +2,12 @@
 
 ## Docker configuracion 
 
-Para poder crear el app.jar
+1. Crear app.jar
 ```
 .\mvnw clean package
+```
+
+2. Iniciar el proyecto
+```
+docker compose up
 ```
