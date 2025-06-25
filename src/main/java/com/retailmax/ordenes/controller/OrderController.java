@@ -1,9 +1,7 @@
 package com.retailmax.ordenes.controller;
 
-
 import java.util.Date;
 import java.util.List;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +18,8 @@ import com.retailmax.ordenes.services.OrderReturnService;
 import com.retailmax.ordenes.services.OrderService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -55,7 +55,8 @@ public class OrderController {
   @PostMapping()
   @Operation(summary = "Añade una nueva Orden", description = "Agrega una nueva orden a la base de datos")
   @ApiResponse(responseCode = "200", description = "Operación exitosa")
-  public ResponseEntity<Order> addOrder(@RequestBody Order order) {
+  public ResponseEntity<Order> addOrder(
+      @Parameter(description = "Objeto Order a crear", required = true, schema = @Schema(implementation = Order.class)) @RequestBody Order order) {
     order.setStatus(OrderStatus.CREATED);
     order.setCreatedAt(new Date());
     order.setOrderDate(new Date());
@@ -73,7 +74,8 @@ public class OrderController {
   @GetMapping("{id}")
   @Operation(summary = "Obtener una Orden por id", description = "Obtiene una orden por su id")
   @ApiResponse(responseCode = "200", description = "Operación exitosa")
-  public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
+  public ResponseEntity<Order> getOrderById(
+      @Parameter(description = "Id de la orden a obtener", required = true) @PathVariable Long id) {
     try {
       Order order = orderService.getOrderById(id);
       return ResponseEntity.ok(order);
@@ -85,24 +87,27 @@ public class OrderController {
   @PutMapping("/{id}")
   @Operation(summary = "Actualiza una orden", description = "Actualiza una orden por su id")
   @ApiResponse(responseCode = "200", description = "Operación exitosa")
-  public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody Order updatedOrder) {
+  public ResponseEntity<Order> updateOrder(
+      @Parameter(description = "Id de la orden a actualizar", required = true) @PathVariable Long id,
+      @Parameter(description = "Objeto Order a actualizar", required = true, schema = @Schema(implementation = Order.class)) @RequestBody Order updatedOrder) {
     try {
       updatedOrder.setId(id);
-      
+
       Order order = orderService.updateOrder(id, updatedOrder);
       return ResponseEntity.ok(order);
-  } catch (RuntimeException e) {
+    } catch (RuntimeException e) {
       if (e instanceof IllegalStateException) {
-          return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
       }
       return ResponseEntity.notFound().build();
-  }
+    }
   }
 
   @DeleteMapping("{id}")
   @Operation(summary = "Elimina una orden", description = "Elimina una orden por su id")
   @ApiResponse(responseCode = "200", description = "Operación exitosa")
-  public ResponseEntity<Void> deleteOrderById(@PathVariable Long id) {
+  public ResponseEntity<Void> deleteOrderById(
+      @Parameter(description = "Id de la orden a eliminar", required = true) @PathVariable Long id) {
     try {
       orderService.delete(id);
       return ResponseEntity.noContent().build();
@@ -114,7 +119,8 @@ public class OrderController {
   @GetMapping("/client/{userId}")
   @Operation(summary = "Obtener Ordenes por cliente", description = "Obtiene lista de ordenes que pertenecen a un cliente")
   @ApiResponse(responseCode = "200", description = "Operación exitosa")
-  public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable String userId) {
+  public ResponseEntity<List<Order>> getOrdersByUserId(
+      @Parameter(description = "Id del usuario del cual se desea obtener la lista de sus ordenes", required = true) @PathVariable String userId) {
     List<Order> orders = orderService.getOrdersByUserId(userId);
     if (orders.isEmpty()) {
       return ResponseEntity.noContent().build();
@@ -125,7 +131,9 @@ public class OrderController {
   @PostMapping("/{orderId}/returns")
   @Operation(summary = "Agregar devolución", description = "Agrega una devolución a una orden ya existente")
   @ApiResponse(responseCode = "200", description = "Operación exitosa")
-  public ResponseEntity<OrderReturn> addReturn(@PathVariable Long orderId, @RequestBody OrderReturn orderReturn) {
+  public ResponseEntity<OrderReturn> addReturn(
+      @Parameter(description = "Id de la orden a la cual se le desea agregar una devolución", required = true) @PathVariable Long orderId,
+      @Parameter(description = "Objeto OrderReturn a crear", required = true, schema = @Schema(implementation = OrderReturn.class)) @RequestBody OrderReturn orderReturn) {
     orderReturn.setStatus(ReturnStatus.REQUESTED);
     OrderReturn createdReturn = orderReturnService.addReturn(orderId, orderReturn);
     if (createdReturn == null) {
@@ -137,7 +145,8 @@ public class OrderController {
   @PutMapping("/{id}/cancellation")
   @Operation(summary = "Cancelar una orden", description = "Cancelar una orden ya creada")
   @ApiResponse(responseCode = "200", description = "Operación exitosa")
-  public ResponseEntity<Order> cancelOrder(@PathVariable Long id) {
+  public ResponseEntity<Order> cancelOrder(
+      @Parameter(description = "Id de la orden a cancelar", required = true) @PathVariable Long id) {
     Order canceledOrder = orderService.cancelOrder(id);
     if (canceledOrder != null) {
       return ResponseEntity.ok(canceledOrder);
