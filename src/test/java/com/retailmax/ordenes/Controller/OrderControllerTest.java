@@ -151,7 +151,6 @@ public class OrderControllerTest {
     }
 
     @Test
-    @Disabled
     void testAddReturn() throws Exception{
      OrderReturn orderReturn = new OrderReturn();
     orderReturn.setId(1L);
@@ -165,7 +164,7 @@ public class OrderControllerTest {
 
         when(orderReturnService.addReturn(eq(1L), any(OrderReturn.class))).thenReturn(orderReturn);
 
-        mockMvc.perform(post("\"/api/v1/orders/1/returns")
+        mockMvc.perform(post("/api/v1/orders/1/returns")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(orderReturn)))
                         .andExpect(status().isCreated())
@@ -173,6 +172,18 @@ public class OrderControllerTest {
                         .andExpect(jsonPath("$.reason").value("Producto defectuoso"));
                         
                         
+    }
+
+    @Test
+    void testCancelOrder() throws Exception{
+
+        when(orderService.cancelOrder(1L)).thenReturn(order);
+
+        mockMvc.perform(put("/api/v1/orders/1/cancellation"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.status").value("CREATED"));
+
     }
 
 }

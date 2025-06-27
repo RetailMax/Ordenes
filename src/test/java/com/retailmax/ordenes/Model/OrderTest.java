@@ -2,6 +2,7 @@ package com.retailmax.ordenes.Model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.junit.jupiter.api.Test;
@@ -9,8 +10,12 @@ import org.junit.jupiter.api.Test;
 import com.retailmax.ordenes.model.order.Order;
 import com.retailmax.ordenes.model.order.OrderItem;
 import com.retailmax.ordenes.model.payment.PaymentEvent;
+import com.retailmax.ordenes.model.status.OrderStatus;
+import com.retailmax.ordenes.model.status.OrderStatusHistory;
 
 public class OrderTest {
+
+
 
     @Test
     void addItemTest(){
