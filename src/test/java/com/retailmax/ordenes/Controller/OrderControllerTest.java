@@ -4,6 +4,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import java.util.ArrayList;
@@ -16,10 +18,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.retailmax.ordenes.assemblers.OrderModelAssembler;
 import com.retailmax.ordenes.controller.OrderController;
 import com.retailmax.ordenes.model.order.Order;
 import com.retailmax.ordenes.model.order.OrderAddress;
@@ -47,6 +52,9 @@ public class OrderControllerTest {
     private ObjectMapper objectMapper;
 
     private Order order;
+
+    @MockBean
+    private OrderModelAssembler assembler;
 
     @BeforeEach
     void setUp() {
@@ -77,6 +85,23 @@ public class OrderControllerTest {
         item.setQuantity(2);
         item.setUnitPrice(1.0);
         order.setItems(List.of(item));
+
+        EntityModel<Order> orderModel = EntityModel.of(order);
+        orderModel.add(
+                linkTo(methodOn(OrderController.class).getOrderById(order.getId())).withSelfRel(),
+                linkTo(methodOn(OrderController.class).listOrders()).withRel("orders"),
+                linkTo(methodOn(OrderController.class).updateOrder(order.getId(), null)).withRel("update"),
+                linkTo(methodOn(OrderController.class).deleteOrderById(order.getId())).withRel("delete"),
+                linkTo(methodOn(OrderController.class).cancelOrder(order.getId())).withRel("cancel"),
+                linkTo(methodOn(OrderController.class).addReturn(order.getId(), null)).withRel("create-return"),
+                linkTo(methodOn(OrderController.class).getOrdersByUserId(order.getUserId())).withRel("user-orders"));
+        when(assembler.toModel(any(Order.class))).thenReturn(orderModel);
+
+        List<EntityModel<Order>> orderModels = List.of(orderModel);
+        CollectionModel<EntityModel<Order>> collectionModel = CollectionModel.of(orderModels,
+                linkTo(methodOn(OrderController.class).listOrders()).withSelfRel(),
+                linkTo(methodOn(OrderController.class).addOrder(null)).withRel("create-order"));
+        when(assembler.toCollectionModel(any())).thenReturn(collectionModel);
     }
 
     @Test
@@ -86,9 +111,8 @@ public class OrderControllerTest {
 
         mockMvc.perform(get("/api/v1/orders"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1L))
-                .andExpect(jsonPath("$[0].userId").value("user1"));
-
+                .andExpect(jsonPath("$._embedded.orderList[0].id").value(1L))
+                .andExpect(jsonPath("$._embedded.orderList[0].userId").value("user1"));
     }
 
     @Test
@@ -146,36 +170,35 @@ public class OrderControllerTest {
 
         mockMvc.perform(get("/api/v1/orders/client/user1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].userId").value("user1"));
-    }
+                .andExpect(jsonPath("$._embedded.orderList[0].id").value(1))
+                .andExpect(jsonPath("$._embedded.orderList[0].userId").value("user1"));
+                }
 
     @Test
-    void testAddReturn() throws Exception{
-     OrderReturn orderReturn = new OrderReturn();
-    orderReturn.setId(1L);
-    orderReturn.setOrder(new Order()); 
-    orderReturn.getOrder().setId(1L);
-    orderReturn.setReturnType("DEVOLUCION");
-    orderReturn.setReason("Producto defectuoso");
-    orderReturn.setProcessedby(null);
-    orderReturn.setProcessedAt(null);
-    orderReturn.setRefundAmount(1000.0);
+    void testAddReturn() throws Exception {
+        OrderReturn orderReturn = new OrderReturn();
+        orderReturn.setId(1L);
+        orderReturn.setOrder(new Order());
+        orderReturn.getOrder().setId(1L);
+        orderReturn.setReturnType("DEVOLUCION");
+        orderReturn.setReason("Producto defectuoso");
+        orderReturn.setProcessedby(null);
+        orderReturn.setProcessedAt(null);
+        orderReturn.setRefundAmount(1000.0);
 
         when(orderReturnService.addReturn(eq(1L), any(OrderReturn.class))).thenReturn(orderReturn);
 
         mockMvc.perform(post("/api/v1/orders/1/returns")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(orderReturn)))
-                        .andExpect(status().isCreated())
-                        .andExpect(jsonPath("$.id").value(1))
-                        .andExpect(jsonPath("$.reason").value("Producto defectuoso"));
-                        
-                        
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(orderReturn)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.reason").value("Producto defectuoso"));
+
     }
 
     @Test
-    void testCancelOrder() throws Exception{
+    void testCancelOrder() throws Exception {
 
         when(orderService.cancelOrder(1L)).thenReturn(order);
 
