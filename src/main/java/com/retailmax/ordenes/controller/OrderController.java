@@ -4,11 +4,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.retailmax.ordenes.assemblers.OrderModelAssembler;
 import com.retailmax.ordenes.model.order.Order;
 import com.retailmax.ordenes.model.payment.PaymentStatus;
 import com.retailmax.ordenes.model.returns.OrderReturn;
@@ -41,21 +44,24 @@ public class OrderController {
   @Autowired
   private OrderReturnService orderReturnService;
 
+  @Autowired
+  private OrderModelAssembler assembler;
+
   @GetMapping()
   @Operation(summary = "Obtener todas las Ordenes", description = "Obtiene una lista de todas las ordenes registradas")
   @ApiResponse(responseCode = "200", description = "Operación exitosa")
-  public ResponseEntity<List<Order>> listOrders() {
+  public ResponseEntity<CollectionModel<EntityModel<Order>>> listOrders() {
     List<Order> oredenes = orderService.getOrders();
     if (oredenes.isEmpty()) {
       return ResponseEntity.noContent().build();
     }
-    return ResponseEntity.ok(oredenes);
+    return ResponseEntity.ok(assembler.toCollectionModel(oredenes));
   }
 
   @PostMapping()
   @Operation(summary = "Añade una nueva Orden", description = "Agrega una nueva orden a la base de datos")
   @ApiResponse(responseCode = "200", description = "Operación exitosa")
-  public ResponseEntity<Order> addOrder(
+  public ResponseEntity<EntityModel<Order>> addOrder(
       @Parameter(description = "Objeto Order a crear", required = true, schema = @Schema(implementation = Order.class)) @RequestBody Order order) {
     order.setStatus(OrderStatus.CREATED);
     order.setCreatedAt(new Date());
@@ -67,18 +73,20 @@ public class OrderController {
     }
     Order result = orderService.addOrder(order);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(assembler.toModel(result));
 
   }
 
   @GetMapping("{id}")
   @Operation(summary = "Obtener una Orden por id", description = "Obtiene una orden por su id")
   @ApiResponse(responseCode = "200", description = "Operación exitosa")
-  public ResponseEntity<Order> getOrderById(
+  public ResponseEntity<EntityModel<Order>> getOrderById(
       @Parameter(description = "Id de la orden a obtener", required = true) @PathVariable Long id) {
     try {
       Order order = orderService.getOrderById(id);
-      return ResponseEntity.ok(order);
+      return ResponseEntity.ok(assembler.toModel(order));
     } catch (Exception e) {
       return ResponseEntity.notFound().build();
     }
@@ -87,14 +95,12 @@ public class OrderController {
   @PutMapping("/{id}")
   @Operation(summary = "Actualiza una orden", description = "Actualiza una orden por su id")
   @ApiResponse(responseCode = "200", description = "Operación exitosa")
-  public ResponseEntity<Order> updateOrder(
+  public ResponseEntity<EntityModel<Order>> updateOrder(
       @Parameter(description = "Id de la orden a actualizar", required = true) @PathVariable Long id,
       @Parameter(description = "Objeto Order a actualizar", required = true, schema = @Schema(implementation = Order.class)) @RequestBody Order updatedOrder) {
     try {
-      updatedOrder.setId(id);
-
       Order order = orderService.updateOrder(id, updatedOrder);
-      return ResponseEntity.ok(order);
+      return ResponseEntity.ok(assembler.toModel(order));
     } catch (RuntimeException e) {
       if (e instanceof IllegalStateException) {
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -119,13 +125,13 @@ public class OrderController {
   @GetMapping("/client/{userId}")
   @Operation(summary = "Obtener Ordenes por cliente", description = "Obtiene lista de ordenes que pertenecen a un cliente")
   @ApiResponse(responseCode = "200", description = "Operación exitosa")
-  public ResponseEntity<List<Order>> getOrdersByUserId(
+  public ResponseEntity<CollectionModel<EntityModel<Order>>> getOrdersByUserId(
       @Parameter(description = "Id del usuario del cual se desea obtener la lista de sus ordenes", required = true) @PathVariable String userId) {
     List<Order> orders = orderService.getOrdersByUserId(userId);
     if (orders.isEmpty()) {
       return ResponseEntity.noContent().build();
     }
-    return ResponseEntity.ok(orders);
+    return ResponseEntity.ok(assembler.toCollectionModel(orders));
   }
 
   @PostMapping("/{orderId}/returns")
@@ -145,11 +151,11 @@ public class OrderController {
   @PutMapping("/{id}/cancellation")
   @Operation(summary = "Cancelar una orden", description = "Cancelar una orden ya creada")
   @ApiResponse(responseCode = "200", description = "Operación exitosa")
-  public ResponseEntity<Order> cancelOrder(
+  public ResponseEntity<EntityModel<Order>> cancelOrder(
       @Parameter(description = "Id de la orden a cancelar", required = true) @PathVariable Long id) {
     Order canceledOrder = orderService.cancelOrder(id);
     if (canceledOrder != null) {
-      return ResponseEntity.ok(canceledOrder);
+      return ResponseEntity.ok(assembler.toModel(canceledOrder));
     }
     return ResponseEntity.notFound().build();
   }
